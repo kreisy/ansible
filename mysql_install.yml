@@ -1,13 +1,20 @@
 ---
-- name: This sets up an mysql server
+- name: Install MySQL
   hosts: all
+  gather_facts: true
   tasks:
-  - name: download remi-mysql repo
-    get_url: url=http://rpms.famillecollet.com/enterprise/6/test/x86_64/compat-mysql55-5.5.11-1.el6.remi.x86_64.rpm dest=/tmp/compat-mysql5.5.11.remi.rpm
-    tags: mysql
-
-  - name: install remi-mysql repo
-    shell: /bin/rpm -Uvh /tmp/compat-mysql5.5.11.remi.rpm
-    register: remi_mysql_repo_result
-    failed_when: "'conflict' in remi_mysql_repo_result.stderr"
-    tags: mysql
+    - name: "Installing Repo"
+      shell: sudo rpm -Uvh http://dev.mysql.com/get/mysql57-community-release-el6-7.noarch.rpm
+      ignore_errors: yes
+    - name: "Installing MySQL 5.7"
+      package: name=mysql-community-server state=present
+    - name: Start the MySQL service
+      become: true
+      service: 
+        name: mysqld
+        state: started
+        enabled: true
+    - name: Find MySQL root password
+      shell: "echo `grep 'temporary.*root@localhost' /var/log/mysqld.log | sed 's/.*root@localhost: //'`"
+      register: mysql_root_pass
+    - debug: var=mysql_root_pass.stdout
