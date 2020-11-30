@@ -10,3 +10,11 @@
     with_items:
       - mysql-community-server
       - MySQL-python
+  
+  - name: Start the MySQL service
+    service: name=mysqld state=started enabled=true
+  
+    with_items:
+      - 127.0.0.1
+      - ::1
+      - localhost
