@@ -1,20 +1,18 @@
 ---
 - name: This sets up an mysql server
   hosts: all
+  become: yes
+  gather_facts: false
+  vars:
+    mysqlsoftware:
+      - python3-pymysql
+      - mysql-client
+      - mysql-server
+
   tasks:
-  - name: Install MySQL 5.7 repo
-    yum: name=http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm state=present
-  
-  - name: Install MySQL 5.7
-    yum: pkg={{ item }}
-    with_items:
-      - mysql-community-server
-      - MySQL-python
-  
-  - name: Start the MySQL service
-    service: name=mysqld state=started enabled=true
-  
-    with_items:
-      - 127.0.0.1
-      - ::1
-      - localhost
+    - name: Install MySQL
+      action: apt install {{ item }}
+      with_items: "{{ mysqlsoftware }}"
+
+    - name: Start the MySQL service
+      action: service name=mysql state=started
