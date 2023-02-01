@@ -13,6 +13,3 @@
     - name: Install MySQL
       action: apt install {{ item }}
       with_items: "{{ mysqlsoftware }}"
-
-    - name: Start the MySQL service
-      action: service name=mysql state=started
